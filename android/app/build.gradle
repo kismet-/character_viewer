@@ -1,0 +1,93 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '1'
+}
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.0'
+}
+
+def dartEnvironmentVariables = [
+        APP_SUFFIX: '',
+        APP_NAME  : 'Character Viewer'
+];
+
+if (project.hasProperty('dart-defines')) {
+    dartEnvironmentVariables = dartEnvironmentVariables + project.property('dart-defines')
+            .split(',')
+            .collectEntries { entry ->
+                def pair = new String(entry.decodeBase64(), 'UTF-8').split('=')
+                if (pair.first() == 'APP_CONFIG_VARIANT') {
+                    switch (pair.last()) {
+                        case "1":
+                            return [
+                                    APP_SUFFIX: ".simpsonsviewer",
+                                    APP_NAME  : "Simpsons Character Viewer"
+                            ]
+                        case "2":
+                            return [
+                                    APP_SUFFIX: ".wireviewer",
+                                    APP_CONFIG_NAME  : "The Wire Character Viewer"
+                            ]
+                    }
+                }
+                [(pair.first()): pair.last()]
+            }
+    println dartEnvironmentVariables
+}
+
+android {
+    namespace "com.exe.sample.character_viewer"
+    compileSdkVersion flutter.compileSdkVersion
+    ndkVersion flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    defaultConfig {
+        applicationId "com.exe.sample"
+        applicationIdSuffix dartEnvironmentVariables.APP_SUFFIX
+        minSdkVersion flutter.minSdkVersion
+        targetSdkVersion flutter.targetSdkVersion
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+        resValue "string", "app_name", dartEnvironmentVariables.APP_CONFIG_NAME
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.debug
+        }
+    }
+}
+
+flutter {
+    source '../..'
+}
+
+dependencies {}
