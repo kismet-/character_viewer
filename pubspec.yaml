@@ -39,6 +39,8 @@ dependency_overrides:
     git:
       url: git@github.com:kismet-/rxdart.git
       ref: main
+  collection: ^1.18.0
+  test_api:
 
 
 flutter:
