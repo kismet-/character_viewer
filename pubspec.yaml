@@ -34,6 +34,12 @@ dev_dependencies:
   flutter_lints: ^2.0.0
   inject_generator: ^1.0.0-alpha.3
 
+dependency_overrides:
+  rxdart:
+    git:
+      url: git@github.com:kismet-/rxdart.git
+      ref: main
+
 
 flutter:
   uses-material-design: true
